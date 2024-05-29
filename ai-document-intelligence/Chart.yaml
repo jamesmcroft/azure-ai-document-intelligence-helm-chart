@@ -1,0 +1,17 @@
+apiVersion: v2
+name: ai-document-intelligence
+description: A Helm chart for Azure AI Document Intelligence custom extraction connected containers
+home: https://github.com/jamesmcroft/azure-ai-document-intelligence-helm-chart
+sources:
+  - https://github.com/jamesmcroft/azure-ai-document-intelligence-helm-chart
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+keywords:
+  - azure
+  - ai
+  - document-intelligence
+  - custom-extraction
+maintainers:
+  - name: jamesmcroft
+    email: me@jamescroft.co.uk

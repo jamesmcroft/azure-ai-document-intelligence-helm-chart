@@ -1,0 +1,88 @@
+nameOverride: ""
+fullnameOverride: ""
+
+storageClassName: "di-azurefile"
+
+documentIntelligence:
+  env: {}
+  studioFileFolder: "/onprem_folder"
+  studioDatabaseFolder: "/onprem_db"
+  sharedRootFolder: "/shared"
+  outputFolder: "/logs"
+  logLevel: "Information"
+  studioFileVolume:
+    storageClassName: "di-azurefile"
+    capacity: "1Gi"
+    accessModes:
+      - ReadWriteMany
+    reclaimPolicy: Retain
+    variables: {}
+  studioDatabaseVolume:
+    storageClassName: "di-azurefile"
+    capacity: "1Gi"
+    accessModes:
+      - ReadWriteMany
+    reclaimPolicy: Retain
+    variables: {}
+  sharedVolume:
+    storageClassName: "di-azurefile"
+    capacity: "1Gi"
+    accessModes:
+      - ReadWriteMany
+    reclaimPolicy: Retain
+    variables: {}
+  outputVolume:
+    storageClassName: "di-azurefile"
+    capacity: "1Gi"
+    accessModes:
+      - ReadWriteMany
+    reclaimPolicy: Retain
+    variables: {}
+
+nginx:
+  image: nginx:alpine
+  port: 5000
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+customTemplate:
+  image: mcr.microsoft.com/azure-cognitive-services/form-recognizer/custom-template-3.0:latest
+  port: 5000
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 8
+      memory: 24Gi
+    requests:
+      cpu: 4
+      memory: 8Gi
+
+layout:
+  image: mcr.microsoft.com/azure-cognitive-services/form-recognizer/layout-3.0:latest
+  port: 5000
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 8
+      memory: 24Gi
+    requests:
+      cpu: 4
+      memory: 8Gi
+
+studio:
+  image: mcr.microsoft.com/azure-cognitive-services/form-recognizer/studio:3.0
+  port: 5001
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 4
+      memory: 8Gi
+    requests:
+      cpu: 2
+      memory: 4Gi

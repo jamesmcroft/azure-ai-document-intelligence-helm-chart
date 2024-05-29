@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ai-document-intelligence.studioFileVolumeName" . }}
+  labels:
+    {{ include "ai-document-intelligence.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "ai-document-intelligence.studioFileVolumeName" . }}
+spec:
+  storageClassName: {{ .Values.documentIntelligence.studioFileVolume.storageClassName }}
+  accessModes: {{ toYaml .Values.documentIntelligence.studioFileVolume.accessModes | nindent 2 }}
+  resources:
+    requests:
+      storage: {{ .Values.documentIntelligence.studioFileVolume.capacity }}

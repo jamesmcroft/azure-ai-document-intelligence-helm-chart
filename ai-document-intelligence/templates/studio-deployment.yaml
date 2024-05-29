@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ai-document-intelligence.studioName" . }}
+  labels: 
+    {{ include "ai-document-intelligence.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "ai-document-intelligence.studioName" . }}
+spec:
+  replicas: {{ .Values.studio.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: {{ include "ai-document-intelligence.studioName" . }}
+  template:
+    metadata:
+      labels: 
+        {{ include "ai-document-intelligence.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "ai-document-intelligence.studioName" . }}  
+    spec:
+      containers:
+        - image: {{ .Values.studio.image }}
+          name: {{ include "ai-document-intelligence.studioName" . }}
+          ports:
+            - containerPort: {{ .Values.studio.port }}
+              hostPort: {{ .Values.studio.port }}
+              protocol: TCP
+          env:
+            - name: ONPREM_LOCALFILE_BASEPATH
+              value: {{ .Values.documentIntelligence.studioFileFolder }}
+            - name: STORAGE_DATABASE_CONNECTION_STRING
+              value: {{ include "ai-document-intelligence.studioDatabaseFilePath" . }}
+          resources: {{ toYaml .Values.studio.resources | nindent 12 }}
+          volumeMounts:
+            - name: file
+              mountPath: {{ .Values.documentIntelligence.studioFileFolder }}
+            - name: database
+              mountPath: {{ .Values.documentIntelligence.studioDatabaseFolder }}
+      volumes:
+        - name: file
+          persistentVolumeClaim:
+            claimName: {{ include "ai-document-intelligence.studioFileVolumeName" . }}
+        - name: database
+          persistentVolumeClaim:
+            claimName: {{ include "ai-document-intelligence.studioDatabaseVolumeName" . }}

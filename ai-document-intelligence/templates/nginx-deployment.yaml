@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ai-document-intelligence.nginxName" . }}
+  labels: 
+    {{ include "ai-document-intelligence.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "ai-document-intelligence.nginxName" . }}
+spec:
+  replicas: {{ .Values.nginx.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: {{ include "ai-document-intelligence.nginxName" . }}
+  template:
+    metadata:
+      labels: 
+        {{ include "ai-document-intelligence.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "ai-document-intelligence.nginxName" . }}
+    spec:
+      containers:
+        - image: {{ .Values.nginx.image }}
+          name: {{ include "ai-document-intelligence.nginxName" . }}
+          ports:
+            - containerPort: {{ .Values.nginx.port }}
+              hostPort: {{ .Values.nginx.port }}
+              protocol: TCP
+          resources: {{ toYaml .Values.nginx.resources | nindent 12 }}
+          volumeMounts:
+            - name: {{ include "ai-document-intelligence.nginxName" . }}
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: {{ include "ai-document-intelligence.nginxName" . }}
+          configMap:
+            name: {{ include "ai-document-intelligence.nginxName" . }}

@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ai-document-intelligence.nginxName" . }}
+  labels:
+    {{ include "ai-document-intelligence.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "ai-document-intelligence.nginxName" . }}
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+        sendfile on;
+        client_max_body_size 90M;
+        upstream docker-custom {
+            server {{ include "ai-document-intelligence.customTemplateName" . }}:{{ .Values.customTemplate.port }};
+        }
+    
+        upstream docker-layout {
+            server {{ include "ai-document-intelligence.layoutName" . }}:{{ .Values.layout.port }};
+        }
+    
+        server {
+            listen {{ .Values.nginx.port }};
+    
+            location = / {
+                proxy_set_header Host $host:$server_port;
+                proxy_set_header Referer $scheme://$host:$server_port;
+                proxy_pass http://docker-custom/;
+            }
+    
+            location /status {
+                proxy_pass http://docker-custom/status;
+            }
+    
+            location /test {
+                return 200 $scheme://$host:$server_port;
+            }
+    
+            location /ready {
+                proxy_pass http://docker-custom/ready;
+            }
+    
+            location /swagger {
+                proxy_pass http://docker-custom/swagger;
+            }
+    
+            location /formrecognizer/documentModels/prebuilt-layout {
+                proxy_set_header Host $host:$server_port;
+                proxy_set_header Referer $scheme://$host:$server_port;
+    
+                add_header 'Access-Control-Allow-Origin' '*' always;
+                add_header 'Access-Control-Allow-Headers' 'cache-control,content-type,ocp-apim-subscription-key,x-ms-useragent' always;
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+                add_header 'Access-Control-Expose-Headers' '*' always;
+    
+                if ($request_method = 'OPTIONS') {
+                    return 200;
+                }
+    
+                proxy_pass http://docker-layout/formrecognizer/documentModels/prebuilt-layout;
+            }
+    
+            location /formrecognizer/documentModels {
+                proxy_set_header Host $host:$server_port;
+                proxy_set_header Referer $scheme://$host:$server_port;
+    
+                add_header 'Access-Control-Allow-Origin' '*' always;
+                add_header 'Access-Control-Allow-Headers' 'cache-control,content-type,ocp-apim-subscription-key,x-ms-useragent' always;
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE' always;
+                add_header 'Access-Control-Expose-Headers' '*' always;
+    
+                if ($request_method = 'OPTIONS') {
+                    return 200;
+                }
+    
+                proxy_pass http://docker-custom/formrecognizer/documentModels;
+            }
+    
+            location /formrecognizer/operations {
+                add_header 'Access-Control-Allow-Origin' '*' always;
+                add_header 'Access-Control-Allow-Headers' 'cache-control,content-type,ocp-apim-subscription-key,x-ms-useragent' always;
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE, PATCH' always;
+                add_header 'Access-Control-Expose-Headers' '*' always;
+    
+                if ($request_method = OPTIONS ) {
+                    return 200;
+                }
+    
+                proxy_pass http://docker-custom/formrecognizer/operations;
+            }
+        }
+    }
