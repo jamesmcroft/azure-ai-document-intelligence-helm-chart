@@ -63,3 +63,12 @@ spec:
         - name: output
           persistentVolumeClaim:
             claimName: {{ include "ai-document-intelligence.outputVolumeName" . }}
+      {{- if .Values.customTemplate.tolerations }}
+      tolerations: {{ toYaml .Values.customTemplate.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.customTemplate.affinity }}
+      affinity: {{ toYaml .Values.customTemplate.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.customTemplate.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.customTemplate.nodeSelector | nindent 8 }}
+      {{- end }}

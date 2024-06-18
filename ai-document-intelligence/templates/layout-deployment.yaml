@@ -61,3 +61,12 @@ spec:
         - name: output
           persistentVolumeClaim:
             claimName: {{ include "ai-document-intelligence.outputVolumeName" . }}
+      {{- if .Values.layout.tolerations }}
+      tolerations: {{ toYaml .Values.layout.tolerations | nindent 6 }}
+      {{- end }}
+      {{- if .Values.layout.affinity }}
+      affinity: {{ toYaml .Values.layout.affinity | nindent 6 }}
+      {{- end }}
+      {{- if .Values.layout.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.layout.nodeSelector | nindent 6 }}
+      {{- end }}
