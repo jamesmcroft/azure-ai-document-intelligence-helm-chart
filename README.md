@@ -53,3 +53,31 @@ You can then access the Studio UI at `http://localhost:5001`. When creating a ne
 
 > [!NOTE]
 > In a real-world scenario, you would expose the services using an ingress controller, service mesh, or other application gateway to control access to the services and provide a secure connection. This is not covered in this Helm chart as you may already be implementing this. Please refer to the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/gateway/) for more information.
+
+## FAQ
+
+### How do I configure tolerations, affinity, and node selectors?
+
+Although not included in the default `values.yaml` file, you can configure these settings using the Helm `--set` option or a `values.yaml` file for each of the deployment configurations. The values include `tolerations`, `affinity`, and `nodeSelector` for each of the deployments.
+
+Here is an example `values.yaml` for how to configure the `layout` deployment with tolerations, affinity, and node selectors:
+
+```yaml
+layout:
+  tolerations:
+    - key: "key"
+      operator: "Equal"
+      value: "value"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: "key"
+                operator: "In"
+                values:
+                  - "value"
+  nodeSelector:
+    key: "value"
+```
