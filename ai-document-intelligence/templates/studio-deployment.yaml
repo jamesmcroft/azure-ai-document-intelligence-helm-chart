@@ -41,3 +41,12 @@ spec:
         - name: database
           persistentVolumeClaim:
             claimName: {{ include "ai-document-intelligence.studioDatabaseVolumeName" . }}
+      {{- if .Values.studio.tolerations }}
+      tolerations: {{ toYaml .Values.studio.tolerations | nindent 6 }}
+      {{- end }}
+      {{- if .Values.studio.affinity }}
+      affinity: {{ toYaml .Values.studio.affinity | nindent 6 }}
+      {{- end }}
+      {{- if .Values.studio.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.studio.nodeSelector | nindent 6 }}
+      {{- end }}
